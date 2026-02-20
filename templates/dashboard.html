@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Simple Pages{% endblock %}
+
+{% block nav %}
+<div class="navbar-item">
+    <div class="buttons">
+        <a class="button is-light is-small" href="/{{ username }}/" target="_blank">View Site</a>
+        <a class="button is-danger is-small is-outlined" href="/api/auth/logout">Logout</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Dashboard</h1>
+        <p class="subtitle">Welcome, <strong>{{ username }}</strong>! Your site is at
+            <a href="/{{ username }}/" target="_blank">pages.mwit.link/{{ username }}/</a>
+        </p>
+
+        <div class="columns">
+            <div class="column is-7">
+                <div class="box">
+                    <h2 class="title is-5">Upload Site</h2>
+                    <p class="mb-4">Upload a <code>.zip</code> or <code>.tar.gz</code> archive containing your site files.</p>
+
+                    <div id="upload-zone" class="upload-zone">
+                        <p class="is-size-4 mb-2">Drag & drop your archive here</p>
+                        <p class="has-text-grey">or click to browse</p>
+                        <input type="file" id="file-input" accept=".zip,.tar.gz,.tgz" style="display:none">
+                    </div>
+
+                    <div id="upload-progress" class="mt-4" style="display:none">
+                        <progress id="progress-bar" class="progress is-link" max="100">0%</progress>
+                        <p id="upload-status" class="has-text-centered"></p>
+                    </div>
+
+                    <div id="upload-result" class="mt-4" style="display:none"></div>
+                </div>
+
+                <div class="box">
+                    <h2 class="title is-5">Your Files</h2>
+                    <div id="file-list" class="file-list">
+                        <p class="has-text-grey">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column is-5">
+                <div class="box">
+                    <h2 class="title is-5">Disk Usage</h2>
+                    <div id="quota-info">
+                        <p><span id="usage-text">Loading...</span></p>
+                        <progress id="quota-bar" class="progress quota-bar is-info" value="0" max="100">0%</progress>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <h2 class="title is-5">Danger Zone</h2>
+                    <p class="mb-4">Delete all your site files. This cannot be undone.</p>
+                    <button id="delete-btn" class="button is-danger is-outlined is-fullwidth">Delete All Files</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/app.js"></script>
+{% endblock %}

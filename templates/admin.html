@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Simple Pages{% endblock %}
+
+{% block nav %}
+<div class="navbar-item">
+    <div class="buttons">
+        <a class="button is-danger is-small is-outlined" href="/api/auth/logout">Logout</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="title">Admin Panel</h1>
+
+        <div class="columns">
+            <div class="column is-6">
+                <div class="box">
+                    <h2 class="title is-5">Generate Invite Codes</h2>
+                    <div class="field has-addons">
+                        <div class="control">
+                            <input id="code-count" class="input" type="number" value="1" min="1" max="50" style="width:80px">
+                        </div>
+                        <div class="control">
+                            <button id="generate-btn" class="button is-primary">Generate</button>
+                        </div>
+                    </div>
+                    <div id="generated-codes" class="mt-4" style="display:none">
+                        <h3 class="title is-6">New Codes:</h3>
+                        <div id="new-codes-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column is-6">
+                <div class="box">
+                    <h2 class="title is-5">All Invite Codes</h2>
+                    <div id="codes-table">
+                        <p class="has-text-grey">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    loadCodes();
+
+    document.getElementById('generate-btn').addEventListener('click', async () => {
+        const count = parseInt(document.getElementById('code-count').value) || 1;
+        const btn = document.getElementById('generate-btn');
+        btn.classList.add('is-loading');
+
+        try {
+            const res = await fetch('/api/admin/codes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ count })
+            });
+            const data = await res.json();
+            if (data.codes) {
+                const container = document.getElementById('new-codes-list');
+                container.innerHTML = data.codes.map(c =>
+                    `<div class="notification is-success is-light"><code class="is-size-5">${c}</code></div>`
+                ).join('');
+                document.getElementById('generated-codes').style.display = '';
+                loadCodes();
+            }
+        } catch (e) {
+            alert('Failed to generate codes');
+        } finally {
+            btn.classList.remove('is-loading');
+        }
+    });
+});
+
+async function loadCodes() {
+    try {
+        const res = await fetch('/api/admin/codes');
+        const data = await res.json();
+
+        const container = document.getElementById('codes-table');
+        if (!data.codes || data.codes.length === 0) {
+            container.innerHTML = '<p class="has-text-grey">No invite codes yet.</p>';
+            return;
+        }
+
+        let html = `<table class="table is-fullwidth is-striped">
+            <thead><tr><th>Code</th><th>Status</th><th>Action</th></tr></thead><tbody>`;
+
+        for (const code of data.codes) {
+            const status = code.used_by
+                ? `<span class="tag is-info">Used by ${code.used_by}</span>`
+                : `<span class="tag is-success">Available</span>`;
+            const action = code.used_by
+                ? ''
+                : `<button class="button is-small is-danger is-outlined" onclick="revokeCode('${code.code}')">Revoke</button>`;
+            html += `<tr><td><code>${code.code}</code></td><td>${status}</td><td>${action}</td></tr>`;
+        }
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    } catch (e) {
+        document.getElementById('codes-table').innerHTML = '<p class="has-text-danger">Failed to load codes.</p>';
+    }
+}
+
+async function revokeCode(code) {
+    if (!confirm(`Revoke code ${code}?`)) return;
+    try {
+        await fetch(`/api/admin/codes/${code}`, { method: 'DELETE' });
+        loadCodes();
+    } catch (e) {
+        alert('Failed to revoke code');
+    }
+}
+</script>
+{% endblock %}

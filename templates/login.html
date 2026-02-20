@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Simple Pages{% endblock %}
+
+{% block content %}
+<section class="hero is-dark is-medium">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <h1 class="title is-1">Simple Pages</h1>
+            <p class="subtitle">Host your static website at pages.mwit.link</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-5">
+                {% match error %}
+                {% when Some with (msg) %}
+                <div class="notification is-danger is-light">{{ msg }}</div>
+                {% when None %}
+                {% endmatch %}
+
+                <div class="box">
+                    <h2 class="title is-4">Login</h2>
+                    <form method="POST" action="/api/auth/login">
+                        <div class="field">
+                            <label class="label">Username</label>
+                            <div class="control">
+                                <input class="input" type="text" name="username" placeholder="your-username" required autofocus>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Password</label>
+                            <div class="control">
+                                <input class="input" type="password" name="password" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <button class="button is-link is-fullwidth" type="submit">Login</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="box">
+                    <h2 class="title is-4">New here?</h2>
+                    <p class="mb-4">Register with an invite code to get started.</p>
+                    <a class="button is-primary is-outlined is-fullwidth" href="/register">Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

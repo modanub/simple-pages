@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Simple Pages{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-5">
+                {% match error %}
+                {% when Some with (msg) %}
+                <div class="notification is-danger is-light">{{ msg }}</div>
+                {% when None %}
+                {% endmatch %}
+
+                <div class="box">
+                    <h2 class="title is-4">Register</h2>
+                    <p class="mb-4">Create your account with an invite code.</p>
+                    <form method="POST" action="/api/auth/register">
+                        <div class="field">
+                            <label class="label">Invite Code</label>
+                            <div class="control">
+                                <input class="input" type="text" name="invite_code" placeholder="XXXX-XXXX" required autofocus>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Username</label>
+                            <div class="control">
+                                <input class="input" type="text" name="username" placeholder="your-username" pattern="[a-zA-Z0-9_-]+" title="Letters, numbers, hyphens, underscores only" required>
+                            </div>
+                            <p class="help">Your site will be at pages.mwit.link/<strong>username</strong>/</p>
+                        </div>
+                        <div class="field">
+                            <label class="label">Password</label>
+                            <div class="control">
+                                <input class="input" type="password" name="password" minlength="6" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <button class="button is-primary is-fullwidth" type="submit">Register</button>
+                        </div>
+                    </form>
+                </div>
+
+                <p class="has-text-centered">
+                    <a href="/">Already have an account? Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
